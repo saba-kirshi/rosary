@@ -8,6 +8,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
@@ -28,11 +29,19 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarDefaults
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemColors
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
@@ -49,6 +58,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -70,9 +80,9 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    //Today()
-                   // LiveRadio()
-                    Rosary()
+                   //Today()
+                   LiveRadio()
+                    //Rosary()
                 }
             }
         }
@@ -87,6 +97,9 @@ val sandal=Color(0xFFD7BB79)
 val sandal2=Color(0xFFCAB78F)
 val sandal3=Color(0xFFBEA76F)
 val sandal4=Color(0xFFE1D2B8)
+val sandal5 = Color(0xFFE8D8B0)
+val sandal6 = Color(0xFFA98E4C)
+
 
 val white= Color.White
 
@@ -267,12 +280,113 @@ fun Today( modifier: Modifier = Modifier) {
 
 }
 
+data class NavItem(
+    val title: String,
+    val icon: ImageVector
+)
+
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LiveRadio(modifier: Modifier = Modifier){
     val scrollState = rememberScrollState()
+    var navItemSelectedIndex by remember{ mutableStateOf(0) }
 
-    Scaffold {it
+    val navList= listOf<NavItem>(
+        NavItem("Today", Icons.Default.Home,) ,
+        NavItem("Live Radio", Icons.Default.Home,),
+        NavItem("Rosary", Icons.Default.Home,),
+        NavItem("Podcasts", Icons.Default.Home,),
+        NavItem("Settings", Icons.Default.Home,),
+
+        )
+
+    Scaffold(
+        bottomBar = {
+            Column {
+                Box(
+                    Modifier
+                        .fillMaxWidth()
+                        .height(80.dp)
+                        .clip(RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp))
+                        .background(sandal5).padding(horizontal = 20.dp, vertical = 10.dp)
+                ){
+                    Row(
+                        modifier=Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ){
+                        Column(verticalArrangement = Arrangement.Center) {
+                            Text(
+                                "The Dr. is In",
+                                color = sandal6,
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 22.sp
+                            )
+                            Text(
+                                "with Dr. Ray Guarendi",
+                                color = sandal6,
+                                fontSize = 14.sp,
+                                fontStyle = FontStyle.Italic
+                            )
+                        }
+                        var paused by remember{
+                            mutableStateOf(false)
+                        }
+                        Box(
+                            Modifier
+                                .clip(shape = CircleShape)
+                                .background(sandal6)
+                                .padding(20.dp).clickable {
+                                    paused=!paused
+                                }
+                        ) {
+                            Icon(
+                                imageVector = if(paused)  Icons.Filled.Pause else Icons.Default.PlayArrow,
+                                contentDescription = null,
+                                tint = Color.White
+                            )
+                        }
+                    }
+                }
+                Divider(
+                    Modifier.fillMaxWidth(),
+                    color=sandal6,
+                    thickness = 0.5.dp
+                )
+                NavigationBar(
+                    containerColor = sandal5,
+
+                    ) {
+
+                    navList.forEachIndexed{ index, item ->
+                        NavigationBarItem(
+                            selected = index == navItemSelectedIndex,
+                            onClick = { navItemSelectedIndex=index},
+                            icon = {
+                                Icon(imageVector = item.icon, contentDescription = item.title)
+                            },
+                            label = {
+                                Text(item.title,)
+                            },
+                            colors = NavigationBarItemDefaults.colors(
+                                selectedIconColor = color2,
+                                selectedTextColor = color2,
+
+                                unselectedIconColor = sandal6,
+                                unselectedTextColor = sandal6,
+
+                                indicatorColor = sandal5
+
+                            )
+                        )
+                    }
+                }
+            }
+
+        }
+    ) {it
+
         Column(
             Modifier
                 .background(backgroundColor)
@@ -344,7 +458,11 @@ fun Rosary(){
     val scrollState = rememberScrollState()
     val tabs= listOf<String>("Joyful", "Sorrowful", "Glorious", "Luminous")
     Scaffold {it
-        Box(Modifier.background(sandal4).padding(it).fillMaxHeight()) {
+        Box(
+            Modifier
+                .background(sandal4)
+                .padding(it)
+                .fillMaxHeight()) {
             Column(
                 Modifier
                     .padding(20.dp)
